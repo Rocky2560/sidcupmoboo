@@ -9,6 +9,8 @@ import com.example.Expense.Tracking.System.Repository.InventoryAdjustmentReposit
 import com.example.Expense.Tracking.System.Repository.InventoryItemRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -243,4 +245,5 @@ public class InventoryService {
     public List<InventoryItem> getItemsWithoutFranchise() {
         return inventoryItemRepository.findByFranchiseIsNull();
     }
+
 }

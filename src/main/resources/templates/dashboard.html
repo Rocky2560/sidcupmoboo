@@ -190,8 +190,8 @@
                     </div>
                 </form>
                 <div class="text-center mt-3 text-muted small">
-                    <p><strong>Admin:</strong> admin@moboo.com / admin123</p>
-                    <p><strong>Franchise:</strong> franchise@moboo.com / franchise123</p>
+                    <p><strong>Login:</strong> sidcup@moboo.com / sidcup123</p>
+<!--                    <p><strong>Franchise:</strong> franchise@moboo.com / franchise123</p>-->
                 </div>
             </div>
         </div>
@@ -225,11 +225,11 @@
                         <i class="fas fa-box me-2"></i> Inventory
                     </a>
                 </li>
-                <li class="nav-item" th:if="${session.userRole == 'ADMIN'}">
-                    <a class="nav-link" th:href="@{/franchises}">
-                        <i class="fas fa-store me-2"></i> Franchises
-                    </a>
-                </li>
+<!--                <li class="nav-item" th:if="${session.userRole == 'ADMIN'}">-->
+<!--                    <a class="nav-link" th:href="@{/franchises}">-->
+<!--                        <i class="fas fa-store me-2"></i> Franchises-->
+<!--                    </a>-->
+<!--                </li>-->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/alerts}">
                         <i class="fas fa-exclamation-triangle me-2"></i> Alerts
@@ -387,10 +387,10 @@
                             <i class="fas fa-plus me-2"></i> Add Item
                         </button>
 
-                        <button class="btn btn-success-gradient" th:if="${session.userRole == 'ADMIN'}"
-                                data-bs-toggle="modal" data-bs-target="#addFranchiseModal">
-                            <i class="fas fa-store me-2"></i> Add Franchise
-                        </button>
+<!--                        <button class="btn btn-success-gradient" th:if="${session.userRole == 'ADMIN'}"-->
+<!--                                data-bs-toggle="modal" data-bs-target="#addFranchiseModal">-->
+<!--                            <i class="fas fa-store me-2"></i> Add Franchise-->
+<!--                        </button>-->
                     </div>
                 </div>
             </div>
@@ -411,12 +411,19 @@
                         <label for="categoryFilter" class="form-label fw-bold text-muted small mb-1">
                             <i class="fas fa-box me-1"></i> Category
                         </label>
-                        <select class="form-select" id="categoryFilter">
-                            <option value="">All Categories</option>
-                            <option value="Ingredients">Ingredients</option>
+                        <select class="form-select" name="category" id="categoryFilter" required>
+                            <option value="" disabled selected>Select Category</option>
                             <option value="Syrups">Syrups</option>
-                            <option value="Fruits">Fruits</option>
-                            <option value="Packaging">Packaging</option>
+                            <option value="Toppings">Toppings</option>
+                            <option value="Topping Ingredients">Topping Ingredients</option>
+                            <option value="Powders">Powders</option>
+                            <option value="Teas">Teas</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Ingredients">Ingredients</option>
+                            <option value="Materials">Materials</option>
+                            <option value="Cleaning">Cleaning</option>
+                            <option value="Extra">Extra</option>
+                            <option value="Other">Other</option>
                         </select>
                     </div>
 

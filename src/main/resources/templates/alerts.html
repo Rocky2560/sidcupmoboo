@@ -230,14 +230,19 @@
                         <i class="fas fa-box me-2"></i> Inventory
                     </a>
                 </li>
-                <li class="nav-item" th:if="${session.userRole == 'ADMIN'}">
-                    <a class="nav-link" th:href="@{/franchises}">
-                        <i class="fas fa-store me-2"></i> Franchises
-                    </a>
-                </li>
+<!--                <li class="nav-item" th:if="${session.userRole == 'ADMIN'}">-->
+<!--                    <a class="nav-link" th:href="@{/franchises}">-->
+<!--                        <i class="fas fa-store me-2"></i> Franchises-->
+<!--                    </a>-->
+<!--                </li>-->
                 <li class="nav-item">
                     <a class="nav-link active" href="#">
                         <i class="fas fa-exclamation-triangle me-2"></i> Alerts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Profile
                     </a>
                 </li>
             </ul>
@@ -351,16 +356,16 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4" th:if="${userRole == 'ADMIN'}">
-                        <label class="form-label fw-bold">Select Franchise</label>
-                        <select class="form-select" id="franchiseFilter" onchange="applyFilter()">
-                            <option value="">All Franchises</option>
-                            <option th:each="franchise : ${franchises}"
-                                    th:value="${franchise.id}"
-                                    th:text="${franchise.name}"
-                                    th:selected="${selectedFranchiseId != null && selectedFranchiseId == franchise.id}">Franchise</option>
-                        </select>
-                    </div>
+<!--                    <div class="col-md-4" th:if="${userRole == 'ADMIN'}">-->
+<!--                        <label class="form-label fw-bold">Select Franchise</label>-->
+<!--                        <select class="form-select" id="franchiseFilter" onchange="applyFilter()">-->
+<!--                            <option value="">All Franchises</option>-->
+<!--                            <option th:each="franchise : ${franchises}"-->
+<!--                                    th:value="${franchise.id}"-->
+<!--                                    th:text="${franchise.name}"-->
+<!--                                    th:selected="${selectedFranchiseId != null && selectedFranchiseId == franchise.id}">Franchise</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
 
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Show Resolved</label>

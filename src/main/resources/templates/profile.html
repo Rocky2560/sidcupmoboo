@@ -414,18 +414,23 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">
+                    <a class="nav-link" th:href="@{/inventory}">
                         <i class="fas fa-box me-2"></i> Inventory
                     </a>
                 </li>
-                <li class="nav-item" th:if="${session.userRole == 'ADMIN'}">
-                    <a class="nav-link" th:href="@{/franchises}">
-                        <i class="fas fa-store me-2"></i> Franchises
-                    </a>
-                </li>
+<!--                <li class="nav-item" th:if="${session.userRole == 'ADMIN'}">-->
+<!--                    <a class="nav-link" th:href="@{/franchises}">-->
+<!--                        <i class="fas fa-store me-2"></i> Franchises-->
+<!--                    </a>-->
+<!--                </li>-->
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/alerts}">
                         <i class="fas fa-exclamation-triangle me-2"></i> Alerts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/profile}">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Profile
                     </a>
                 </li>
             </ul>

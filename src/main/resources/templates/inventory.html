@@ -389,9 +389,9 @@
                                         <th>S.N</th>
                                         <th>Item Name</th>
                                         <th>Category</th>
-<!--                                        <th>Count</th>-->
-<!--                                        <th>Expiry Date</th>-->
-<!--                                        <th>Status</th>-->
+                                        <!--                                        <th>Count</th>-->
+                                        <!--                                        <th>Expiry Date</th>-->
+                                        <!--                                        <th>Status</th>-->
                                         <th th:if="${session.userRole == 'ADMIN'}">Actions</th>
                                     </tr>
                                     </thead>
@@ -400,17 +400,17 @@
                                         <td th:text="${itemcount.count}"></td>
                                         <td th:text="${item.name}"></td>
                                         <td th:text="${item.category}"></td>
-<!--                                        <td>-->
-<!--                                                <span th:text="${item.count}"-->
-<!--                                                      th:class="${item.count < 10 ? 'text-warning fw-bold' : 'text-dark'}">25</span>-->
-<!--                                        </td>-->
-<!--                                        <td th:text="${#temporals.format(item.expiryDate, 'yyyy-MM-dd')}">2024-01-15</td>-->
-<!--                                        <td>-->
-<!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRED'}" class="badge bg-danger">Expired</span>-->
-<!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRING_SOON'}" class="badge bg-warning text-dark">Expiring Soon</span>-->
-<!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'LOW_STOCK'}" class="badge bg-orange">Low Stock</span>-->
-<!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'GOOD'}" class="badge bg-success">Good</span>-->
-<!--                                        </td>-->
+                                        <!--                                        <td>-->
+                                        <!--                                                <span th:text="${item.count}"-->
+                                        <!--                                                      th:class="${item.count < 10 ? 'text-warning fw-bold' : 'text-dark'}">25</span>-->
+                                        <!--                                        </td>-->
+                                        <!--                                        <td th:text="${#temporals.format(item.expiryDate, 'yyyy-MM-dd')}">2024-01-15</td>-->
+                                        <!--                                        <td>-->
+                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRED'}" class="badge bg-danger">Expired</span>-->
+                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRING_SOON'}" class="badge bg-warning text-dark">Expiring Soon</span>-->
+                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'LOW_STOCK'}" class="badge bg-orange">Low Stock</span>-->
+                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'GOOD'}" class="badge bg-success">Good</span>-->
+                                        <!--                                        </td>-->
                                         <td>
                                             <button class="btn btn-sm btn-outline-primary" th:if="${session.userRole == 'ADMIN'}"
                                                     data-bs-toggle="modal"
@@ -518,22 +518,22 @@
                             <option value="Other">Other</option>
                         </select>
                     </div>
-<!--                    <div class="mb-3">-->
-<!--                        <label class="form-label">Count</label>-->
-<!--                        <input type="number" class="form-control" name="count" min="0" required>-->
-<!--                    </div>-->
-<!--                    <div class="mb-3">-->
-<!--                        <label class="form-label">Expiry Date</label>-->
-<!--                        <input type="date" class="form-control" name="expiryDate" required>-->
-<!--                    </div>-->
-<!--                    <div class="mb-3" th:if="${session.userRole == 'ADMIN'}">-->
-<!--                        <label class="form-label">Franchise</label>-->
-<!--                        <select class="form-select" name="franchiseId" required>-->
-<!--                            <option th:each="franchise : ${franchises}"-->
-<!--                                    th:value="${franchise.id}"-->
-<!--                                    th:text="${franchise.name}">Franchise</option>-->
-<!--                        </select>-->
-<!--                    </div>-->
+                    <!--                    <div class="mb-3">-->
+                    <!--                        <label class="form-label">Count</label>-->
+                    <!--                        <input type="number" class="form-control" name="count" min="0" required>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="mb-3">-->
+                    <!--                        <label class="form-label">Expiry Date</label>-->
+                    <!--                        <input type="date" class="form-control" name="expiryDate" required>-->
+                    <!--                    </div>-->
+                    <!--                    <div class="mb-3" th:if="${session.userRole == 'ADMIN'}">-->
+                    <!--                        <label class="form-label">Franchise</label>-->
+                    <!--                        <select class="form-select" name="franchiseId" required>-->
+                    <!--                            <option th:each="franchise : ${franchises}"-->
+                    <!--                                    th:value="${franchise.id}"-->
+                    <!--                                    th:text="${franchise.name}">Franchise</option>-->
+                    <!--                        </select>-->
+                    <!--                    </div>-->
                     <input type="hidden" name="franchiseId" th:if="${session.userRole == 'FRANCHISE'}"
                            th:value="${session.franchiseId}">
                 </div>
@@ -556,13 +556,13 @@
             </div>
             <form th:action="@{/inventory/items/update}" method="post">
                 <div class="modal-body">
-<!--                    <div class="text-center mb-3">-->
-<!--                        <div class="health-indicator"-->
-<!--                             th:classappend="${item.count == 0 ? 'health-critical' : (item.count < 10 ? 'health-warning' : 'health-good')}">-->
-<!--                            <span th:text="${item.count}">25</span>-->
-<!--                        </div>-->
-<!--                        <p class="text-muted">Current Stock</p>-->
-<!--                    </div>-->
+                    <!--                    <div class="text-center mb-3">-->
+                    <!--                        <div class="health-indicator"-->
+                    <!--                             th:classappend="${item.count == 0 ? 'health-critical' : (item.count < 10 ? 'health-warning' : 'health-good')}">-->
+                    <!--                            <span th:text="${item.count}">25</span>-->
+                    <!--                        </div>-->
+                    <!--                        <p class="text-muted">Current Stock</p>-->
+                    <!--                    </div>-->
 
                     <div class="mb-3">
                         <label class="form-label">Item Name</label>

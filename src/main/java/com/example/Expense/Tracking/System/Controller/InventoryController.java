@@ -12,6 +12,9 @@ import com.example.Expense.Tracking.System.Service.*;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -47,7 +50,7 @@ public class InventoryController {
         this.service = itemService;
     }
 
-//    @GetMapping
+    //    @GetMapping
 //    public String inventoryDashboard(HttpSession session, Model model,
 //                                     @RequestParam(required = false) String search,
 //                                     @RequestParam(required = false) String category) {
@@ -112,69 +115,79 @@ public class InventoryController {
 //
 //        return "inventory";
 //    }
-@GetMapping
-public String inventoryDashboard(HttpSession session, Model model,
-                                 @RequestParam(required = false) String search,
-                                 @RequestParam(required = false) String category) {
-    String userEmail = (String) session.getAttribute("user");
-    if (userEmail == null) {
-        return "redirect:/dashboard";
-    }
+    @GetMapping
+    public String inventoryDashboard(HttpSession session, Model model,
+                                     @RequestParam(required = false) String search,
+                                     @RequestParam(required = false) String category,
+                                     @RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "10") int size) {
+        String userEmail = (String) session.getAttribute("user");
+        if (userEmail == null) {
+            return "redirect:/dashboard";
+        }
 
-    String userRole = (String) session.getAttribute("userRole");
-    model.addAttribute("userRole", userRole);
-    model.addAttribute("searchTerm", search != null ? search : "");
-    model.addAttribute("selectedCategory", category != null ? category : "All");
+        String userRole = (String) session.getAttribute("userRole");
+        model.addAttribute("userRole", userRole);
+        model.addAttribute("searchTerm", search != null ? search : "");
+        model.addAttribute("selectedCategory", category != null ? category : "All");
 
-    // Get the current user's franchise ID (works for both ADMIN and FRANCHISE)
-    Long currentFranchiseId = (Long) session.getAttribute("franchiseId");
+        // --- Pagination setup ---
+        Pageable pageable = PageRequest.of(page, size);
+        // Get the current user's franchise ID (works for both ADMIN and FRANCHISE)
+        Long currentFranchiseId = (Long) session.getAttribute("franchiseId");
+        Page<Item> inventoryPage = Page.empty();
 
-    if (currentFranchiseId == null) {
-        // Handle case where user has no franchise assigned
-        model.addAttribute("inventoryItems", List.of());
-        model.addAttribute("totalItems", 0);
-        model.addAttribute("lowStockCount", 0);
-        model.addAttribute("expiringSoonCount", 0);
-        model.addAttribute("expiredCount", 0);
-    } else {
-        Franchise currentFranchise = franchiseService.findById(currentFranchiseId).orElse(null);
-
-        if (currentFranchise != null) {
-            // Both ADMIN and FRANCHISE users get items from their respective franchise only
-            List<InventoryItem> shopItems = inventoryService.searchItems(search, category, currentFranchise);
-            model.addAttribute("inventoryItems", shopItems);
-            model.addAttribute("totalItems", shopItems.size());
-
-            // Stats filtered by the current shop/franchise only
-            model.addAttribute("lowStockCount",
-                    shopItems.stream().filter(item -> item.getCount() < 10).count());
-            model.addAttribute("expiringSoonCount",
-                    shopItems.stream().filter(item ->
-                            item.getExpiryDate().isBefore(LocalDate.now().plusDays(7)) &&
-                                    !item.getExpiryDate().isBefore(LocalDate.now())).count());
-            model.addAttribute("expiredCount",
-                    shopItems.stream().filter(item -> item.getExpiryDate().isBefore(LocalDate.now())).count());
-        } else {
-            // Franchise not found
+        if (currentFranchiseId == null) {
+            // Handle case where user has no franchise assigned
             model.addAttribute("inventoryItems", List.of());
             model.addAttribute("totalItems", 0);
             model.addAttribute("lowStockCount", 0);
             model.addAttribute("expiringSoonCount", 0);
             model.addAttribute("expiredCount", 0);
+        } else {
+            Franchise currentFranchise = franchiseService.findById(currentFranchiseId).orElse(null);
+
+            if (currentFranchise != null) {
+                // Both ADMIN and FRANCHISE users get items from their respective franchise only
+                Franchise franchise = franchiseService.findById(currentFranchiseId).orElse(null);
+                if (franchise != null) {
+                    // Service handles repository call with pagination
+                    inventoryPage = service.searchItemsPaginated(search, category, pageable);
+                }
+                List<InventoryItem> shopItems = inventoryService.searchItems(search, category, currentFranchise);
+                model.addAttribute("inventoryItems", shopItems);
+                model.addAttribute("totalItems", shopItems.size());
+
+                // Stats filtered by the current shop/franchise only
+                model.addAttribute("lowStockCount",
+                        shopItems.stream().filter(item -> item.getCount() < 10).count());
+                model.addAttribute("expiringSoonCount",
+                        shopItems.stream().filter(item ->
+                                item.getExpiryDate().isBefore(LocalDate.now().plusDays(7)) &&
+                                        !item.getExpiryDate().isBefore(LocalDate.now())).count());
+                model.addAttribute("expiredCount",
+                        shopItems.stream().filter(item -> item.getExpiryDate().isBefore(LocalDate.now())).count());
+            } else {
+                // Franchise not found
+                model.addAttribute("inventoryItems", List.of());
+                model.addAttribute("totalItems", 0);
+                model.addAttribute("lowStockCount", 0);
+                model.addAttribute("expiringSoonCount", 0);
+                model.addAttribute("expiredCount", 0);
+            }
         }
-    }
 
-    // Add categories for filter dropdown
-    model.addAttribute("categories", inventoryService.getAllCategories());
+        // Add categories for filter dropdown
+        model.addAttribute("categories", inventoryService.getAllCategories());
 
-    // Only show franchises list to ADMIN for reference (not for filtering items)
+        // Only show franchises list to ADMIN for reference (not for filtering items)
 //    if ("ADMIN".equals(userRole)) {
         List<Franchise> franchises = franchiseService.getAllFranchises();
         model.addAttribute("franchises", franchises);
 //    }
-    model.addAttribute("listItems", service.getAllItems());
-    return "inventory";
-}
+        model.addAttribute("listItems", service.getAllItems());
+        return "inventory";
+    }
 
     @PostMapping("items/save")
     public String saveItem(@ModelAttribute("item") Item item) {
