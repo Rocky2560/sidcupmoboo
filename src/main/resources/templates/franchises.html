@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Franchises - Moboo Inventory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            --danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            --orange-gradient: linear-gradient(135deg, #fda085 0%, #f6d365 100%);
+        }
+
+        body {
+            background-color: #f8f9fc;
+            overflow-x: hidden;
+        }
+
+        .bg-orange {
+            background: var(--orange-gradient);
+        }
+
+        .sidebar {
+            background: white;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link {
+            color: #333;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link.active,
+        .sidebar .nav-link:hover {
+            background: var(--primary-gradient);
+            color: white !important;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -250px;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 15px;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .btn-gradient {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success-gradient {
+            background: var(--success-gradient);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table th {
+            font-weight: 600;
+            background-color: #f1f3f6;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .navbar {
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+        }
+
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+<!-- Main Layout -->
+<div th:if="${session.user != null}">
+    <!-- Sidebar -->
+    <nav class="sidebar d-none d-md-block">
+        <div class="p-4">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-primary text-white p-2 rounded-circle me-3">
+                    <i class="fas fa-mug-hot fa-lg"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 navbar-brand">Moboo Inventory</h5>
+                    <small class="text-muted" th:text="${session.userRole}">Role</small>
+                </div>
+            </div>
+
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/dashboard}">
+                        <i class="fas fa-home me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/inventory}">
+                        <i class="fas fa-box me-2"></i> Inventory
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <i class="fas fa-store me-2"></i> Franchises
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/alerts}">
+                        <i class="fas fa-exclamation-triangle me-2"></i> Alerts
+                    </a>
+                </li>
+            </ul>
+
+            <div class="mt-4">
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-outline-danger w-100">
+                        <i class="fas fa-sign-out-alt me-2"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="d-flex ms-auto">
+                        <div class="dropdown">
+                            <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-2"></i>
+                                <span th:text="${session.userName}">User Name</span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form th:action="@{/logout}" method="post" class="d-inline">
+                                        <button type="submit" class="dropdown-item">
+                                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid py-4">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Select Franchise</label>
+                        <select class="form-select" id="franchiseFilter" onchange="applyFranchiseFilter()">
+                            <option value="">All Franchises</option>
+                            <option th:each="franchise : ${franchises}"
+                                    th:value="${franchise.id}"
+                                    th:text="${franchise.name}"
+                                    th:selected="${selectedFranchiseId != null && selectedFranchiseId == franchise.id}">Franchise</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Filter by Status</label>
+                        <select class="form-select" id="statusFilter" onchange="applyStatusFilter()">
+                            <option value="ALL" th:selected="${selectedStatus == 'ALL'}">All Status</option>
+                            <option value="GOOD" th:selected="${selectedStatus == 'GOOD'}">Good</option>
+                            <option value="LOW_STOCK" th:selected="${selectedStatus == 'LOW_STOCK'}">Low Stock</option>
+                            <option value="EXPIRING_SOON" th:selected="${selectedStatus == 'EXPIRING_SOON'}">Expiring Soon</option>
+                            <option value="EXPIRED" th:selected="${selectedStatus == 'EXPIRED'}">Expired</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-primary text-white">
+                                <i class="fas fa-box fa-lg"></i>
+                            </div>
+                            <h6 class="card-title mb-0">Total Items</h6>
+                            <h3 class="card-text mb-0" th:text="${totalItems}">24</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-warning text-white">
+                                <i class="fas fa-exclamation-triangle fa-lg"></i>
+                            </div>
+                            <h6 class="card-title mb-0">Low Stock</h6>
+                            <h3 class="card-text mb-0" th:text="${lowStockCount}">8</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-orange text-white">
+                                <i class="fas fa-clock fa-lg"></i>
+                            </div>
+                            <h6 class="card-title mb-0">Expiring Soon</h6>
+                            <h3 class="card-text mb-0" th:text="${expiringSoonCount}">5</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card stat-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="card-icon bg-danger text-white">
+                                <i class="fas fa-calendar-times fa-lg"></i>
+                            </div>
+                            <h6 class="card-title mb-0">Expired</h6>
+                            <h3 class="card-text mb-0" th:text="${expiredCount}">3</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Franchise Info (if selected) -->
+            <div class="row mb-4" th:if="${selectedFranchise != null}">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h5 class="mb-0">
+                            <i class="fas fa-store me-2"></i>
+                            Viewing inventory for: <span th:text="${selectedFranchise.name}">Franchise Name</span>
+                        </h5>
+                        <p class="mb-0">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span th:text="${selectedFranchise.email}">email@franchise.com</span>
+<!--                            <i class="fas fa-map-marker-alt me-2"></i>-->
+<!--                            <span th:text="${selectedFranchise.address}">Address</span>-->
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Inventory Items</h5>
+                            <span class="text-muted small" th:if="${selectedFranchise != null}">
+                                Franchise: <span th:text="${selectedFranchise.name}">Franchise</span>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>S.N</th>
+                                        <th>Item Name</th>
+                                        <th>Category</th>
+                                        <th>Count</th>
+                                        <th>Expiry Date</th>
+                                        <th>Status</th>
+                                        <th>Franchise</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="item,itemStat : ${inventoryItems}">
+                                        <td th:text="${itemStat.count}"></td>
+                                        <td th:text="${item.name}">Tapioca Pearls</td>
+                                        <td th:text="${item.category}">Ingredients</td>
+                                        <td>
+                                                <span th:text="${item.count}"
+                                                      th:class="${item.count < 5 ? 'text-danger fw-bold' : (item.count < 10 ? 'text-warning fw-bold' : 'text-dark')}">
+                                                    25
+                                                </span>
+                                            <span th:if="${item.count < 5}" class="badge bg-danger ms-2">CRITICAL</span>
+                                        </td>
+                                        <td th:text="${#temporals.format(item.expiryDate, 'yyyy-MM-dd')}">2024-01-15</td>
+                                        <td>
+                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRED'}" class="badge bg-danger">Expired</span>
+                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRING_SOON'}" class="badge bg-warning text-dark">Expiring Soon</span>
+                                            <span th:if="${#strings.toUpperCase(item.status) == 'LOW_STOCK'}" class="badge bg-orange">Low Stock</span>
+                                            <span th:if="${#strings.toUpperCase(item.status) == 'GOOD'}" class="badge bg-success">Good</span>
+                                        </td>
+                                        <td th:text="${item.franchise.name}">Central London</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-center py-4" th:if="${#lists.isEmpty(inventoryItems)}">
+                                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No inventory items found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Franchise filter functionality
+    function applyFranchiseFilter() {
+        const franchiseFilter = document.getElementById('franchiseFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const currentUrl = new URL(window.location.href);
+
+        // Remove existing parameters
+        currentUrl.searchParams.delete('franchiseId');
+        currentUrl.searchParams.delete('statusFilter');
+
+        // Add new parameters
+        if (franchiseFilter !== '') {
+            currentUrl.searchParams.set('franchiseId', franchiseFilter);
+        }
+        if (statusFilter !== 'ALL') {
+            currentUrl.searchParams.set('statusFilter', statusFilter);
+        }
+
+        window.location.href = currentUrl.toString();
+    }
+
+    // Status filter functionality
+    function applyStatusFilter() {
+        const franchiseFilter = document.getElementById('franchiseFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const currentUrl = new URL(window.location.href);
+
+        // Remove existing parameters
+        currentUrl.searchParams.delete('franchiseId');
+        currentUrl.searchParams.delete('statusFilter');
+
+        // Add new parameters
+        if (franchiseFilter !== '') {
+            currentUrl.searchParams.set('franchiseId', franchiseFilter);
+        }
+        if (statusFilter !== 'ALL') {
+            currentUrl.searchParams.set('statusFilter', statusFilter);
+        }
+
+        window.location.href = currentUrl.toString();
+    }
+</script>
+</body>
+</html>
