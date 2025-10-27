@@ -11,6 +11,10 @@ import com.example.Expense.Tracking.System.Service.*;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +41,9 @@ public class DashboardController {
 
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model,
-                            @RequestParam(required = false) String statusFilter) {
+                            @RequestParam(required = false) String statusFilter,
+                            @RequestParam(defaultValue = "0") int page,
+                            @RequestParam(defaultValue = "10") int size) {
         String userEmail = (String) session.getAttribute("user");
         if (userEmail == null) {
             return "dashboard"; // This will show login modal
@@ -50,7 +56,16 @@ public class DashboardController {
 //        if (UserRole.ADMIN.name().equals(userRole)) {
             // Get admin's franchise from session
             Long adminFranchiseId = (Long) session.getAttribute("franchiseId");
-        System.out.println(session.getAttribute("franchiseId"));
+        System.out.println(userRole);
+//        model.addAttribute("franchiseId", adminFranchiseId);
+//        System.out.println(session.getAttribute("franchiseId"));
+        size = Math.min(size, 50); // prevent abuse
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+
+        Page<InventoryItem> inventoryPage = inventoryService
+                .findInventoryForCurrentUserFranchise(pageable);
+
+        model.addAttribute("inventoryPage", inventoryPage);
 
             if (adminFranchiseId != null) {
                 Franchise adminFranchise = franchiseService.findById(adminFranchiseId).orElse(null);

@@ -30,6 +30,9 @@ public class InventoryService {
     @Autowired
     private AlertService alertService;
 
+    @Autowired
+    private UserService userService;
+
     public List<InventoryItem> getAllItems() {
         return inventoryItemRepository.findAll();
     }
@@ -245,5 +248,22 @@ public class InventoryService {
     public List<InventoryItem> getItemsWithoutFranchise() {
         return inventoryItemRepository.findByFranchiseIsNull();
     }
+
+    public InventoryService(InventoryItemRepository inventoryItemRepository,
+                                UserService userService) {
+        this.inventoryItemRepository = inventoryItemRepository;
+        this.userService = userService;
+    }
+
+    public Page<InventoryItem> findInventoryForCurrentUserFranchise(Pageable pageable) {
+        Franchise franchise = userService.getCurrentUserFranchise();
+        return inventoryItemRepository.findByFranchise(franchise, pageable);
+    }
+//    public Page<InventoryItem> findInventoryForCurrentUser(Pageable pageable) {
+//        User currentUser = userService.getCurrentUser(); // implement this
+//        return inventoryItemRepository.findByUser(currentUser, pageable);
+//    }
+
+
 
 }

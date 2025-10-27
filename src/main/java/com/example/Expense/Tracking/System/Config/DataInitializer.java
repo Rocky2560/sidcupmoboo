@@ -166,7 +166,7 @@ public class DataInitializer implements CommandLineRunner {
         ));
         // Create franchises
         Franchise centralLondon = franchiseRepository.save(
-                new Franchise("Moboo Central London", "central@moboo.com")
+                new Franchise("sidcup Shop", "sidcup@moboo.com")
         );
 
         Franchise manchester = franchiseRepository.save(

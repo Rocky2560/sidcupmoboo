@@ -2,6 +2,9 @@ package com.example.Expense.Tracking.System.Repository;
 
 import com.example.Expense.Tracking.System.Entity.InventoryItem;
 import com.example.Expense.Tracking.System.Entity.Franchise;
+import com.example.Expense.Tracking.System.Entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,5 +27,8 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     @Query("SELECT i FROM InventoryItem i WHERE i.franchise = :franchise AND i.count < 10")
     List<InventoryItem> findLowStockItems(@Param("franchise") Franchise franchise);
 
+
     List<InventoryItem> findByFranchiseIsNull();
+//    Page<InventoryItem> findByFr(User user, Pageable pageable);x
+    Page<InventoryItem> findByFranchise(Franchise franchise, Pageable pageable);
 }
