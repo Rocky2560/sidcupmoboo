@@ -1,10 +1,12 @@
 package com.example.Expense.Tracking.System.Controller;
 
 import com.example.Expense.Tracking.System.Entity.Franchise;
+import com.example.Expense.Tracking.System.Entity.Item;
 import com.example.Expense.Tracking.System.Enum.ItemStatus;
 import com.example.Expense.Tracking.System.Enum.UserRole;
 import com.example.Expense.Tracking.System.Entity.InventoryItem;
 import com.example.Expense.Tracking.System.Entity.User;
+import com.example.Expense.Tracking.System.Repository.ItemRepository;
 import com.example.Expense.Tracking.System.Service.*;
 
 import jakarta.servlet.http.HttpSession;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,6 +30,9 @@ public class DashboardController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ItemRepository itemRepository;
 
 
     @GetMapping("/dashboard")
@@ -138,7 +144,18 @@ public class DashboardController {
         }
         model.addAttribute("userEmail", userEmail);
         model.addAttribute("currentPage", "dashboard");
+        model.addAttribute("categories", List.of(
+                "Syrups", "Toppings", "Topping Ingredients", "Powders",
+                "Teas", "Snacks", "Ingredients", "Materials",
+                "Cleaning", "Extra", "Other"
+        ));
         return "dashboard";
+    }
+
+    @GetMapping("/get-items")
+    @ResponseBody
+    public List<Item> getItems(@RequestParam String category) {
+        return itemRepository.findByCategory(category);
     }
 
         private List<InventoryItem> filterItemsByStatus(List<InventoryItem> items, String statusFilter) {

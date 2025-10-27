@@ -3,11 +3,15 @@ package com.example.Expense.Tracking.System.Service;
 import com.example.Expense.Tracking.System.Entity.Franchise;
 import com.example.Expense.Tracking.System.Entity.Item;
 import com.example.Expense.Tracking.System.Repository.ItemRepository;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class ItemService {
@@ -77,4 +81,29 @@ public class ItemService {
     public void deleteItem(Long id) {
         repo.deleteById(id);
     }
+
+    public Page<Item> findItems(String effectiveCategory, String search, Pageable pageable) {
+        return repo.findAll((root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Filter by category (if provided)
+            if (effectiveCategory != null && !effectiveCategory.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(
+                        criteriaBuilder.lower(root.get("category")),
+                        effectiveCategory.toLowerCase()
+                ));
+            }
+
+            // Filter by name (search term)
+            if (search != null && !search.trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("name")),
+                        "%" + search.trim().toLowerCase() + "%"
+                ));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+    }
+
 }

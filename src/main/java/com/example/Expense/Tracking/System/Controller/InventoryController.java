@@ -118,7 +118,7 @@ public class InventoryController {
     @GetMapping
     public String inventoryDashboard(HttpSession session, Model model,
                                      @RequestParam(required = false) String search,
-                                     @RequestParam(required = false) String category,
+                                     @RequestParam(defaultValue = "All") String category,
                                      @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size) {
         String userEmail = (String) session.getAttribute("user");
@@ -132,10 +132,11 @@ public class InventoryController {
         model.addAttribute("selectedCategory", category != null ? category : "All");
 
         // --- Pagination setup ---
-        Pageable pageable = PageRequest.of(page, size);
         // Get the current user's franchise ID (works for both ADMIN and FRANCHISE)
         Long currentFranchiseId = (Long) session.getAttribute("franchiseId");
-        Page<Item> inventoryPage = Page.empty();
+        String effectiveCategory = "All".equals(category) ? null : category;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Item> pageItems = service.findItems(effectiveCategory, search, pageable);
 
         if (currentFranchiseId == null) {
             // Handle case where user has no franchise assigned
@@ -150,10 +151,10 @@ public class InventoryController {
             if (currentFranchise != null) {
                 // Both ADMIN and FRANCHISE users get items from their respective franchise only
                 Franchise franchise = franchiseService.findById(currentFranchiseId).orElse(null);
-                if (franchise != null) {
-                    // Service handles repository call with pagination
-                    inventoryPage = service.searchItemsPaginated(search, category, pageable);
-                }
+//                if (franchise != null) {
+//                    // Service handles repository call with pagination
+//                    inventoryPage = service.searchItemsPaginated(search, category, pageable);
+//                }
                 List<InventoryItem> shopItems = inventoryService.searchItems(search, category, currentFranchise);
                 model.addAttribute("inventoryItems", shopItems);
                 model.addAttribute("totalItems", shopItems.size());
@@ -174,6 +175,8 @@ public class InventoryController {
                 model.addAttribute("lowStockCount", 0);
                 model.addAttribute("expiringSoonCount", 0);
                 model.addAttribute("expiredCount", 0);
+                model.addAttribute("inventoryPage", List.of());
+
             }
         }
 
@@ -186,6 +189,15 @@ public class InventoryController {
         model.addAttribute("franchises", franchises);
 //    }
         model.addAttribute("listItems", service.getAllItems());
+        model.addAttribute("pageItems", pageItems);
+        model.addAttribute("searchTerm", search);
+        model.addAttribute("selectedCategory", category);
+        model.addAttribute("categories", service.getAllCategories());
+        model.addAttribute("categories", List.of(
+                "Syrups", "Toppings", "Topping Ingredients", "Powders",
+                "Teas", "Snacks", "Ingredients", "Materials",
+                "Cleaning", "Extra", "Other"
+        ));
         return "inventory";
     }
 

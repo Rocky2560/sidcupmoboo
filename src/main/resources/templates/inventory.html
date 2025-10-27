@@ -389,35 +389,22 @@
                                         <th>S.N</th>
                                         <th>Item Name</th>
                                         <th>Category</th>
-                                        <!--                                        <th>Count</th>-->
-                                        <!--                                        <th>Expiry Date</th>-->
-                                        <!--                                        <th>Status</th>-->
                                         <th th:if="${session.userRole == 'ADMIN'}">Actions</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr th:each="item, itemcount : ${listItems}">
-                                        <td th:text="${itemcount.count}"></td>
+                                    <tr th:each="item, itemStat : ${pageItems}">
+                                        <!-- Global serial number: currentPage * pageSize + index + 1 -->
+                                        <td th:text="${pageItems.number * pageItems.size + itemStat.index + 1}"></td>
                                         <td th:text="${item.name}"></td>
                                         <td th:text="${item.category}"></td>
-                                        <!--                                        <td>-->
-                                        <!--                                                <span th:text="${item.count}"-->
-                                        <!--                                                      th:class="${item.count < 10 ? 'text-warning fw-bold' : 'text-dark'}">25</span>-->
-                                        <!--                                        </td>-->
-                                        <!--                                        <td th:text="${#temporals.format(item.expiryDate, 'yyyy-MM-dd')}">2024-01-15</td>-->
-                                        <!--                                        <td>-->
-                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRED'}" class="badge bg-danger">Expired</span>-->
-                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRING_SOON'}" class="badge bg-warning text-dark">Expiring Soon</span>-->
-                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'LOW_STOCK'}" class="badge bg-orange">Low Stock</span>-->
-                                        <!--                                            <span th:if="${#strings.toUpperCase(item.status) == 'GOOD'}" class="badge bg-success">Good</span>-->
-                                        <!--                                        </td>-->
-                                        <td>
-                                            <button class="btn btn-sm btn-outline-primary" th:if="${session.userRole == 'ADMIN'}"
+                                        <td th:if="${session.userRole == 'ADMIN'}">
+                                            <button class="btn btn-sm btn-outline-primary"
                                                     data-bs-toggle="modal"
                                                     th:data-bs-target="'#adjustModal' + ${item.id}">
                                                 <i class="fas fa-edit"></i> Adjust
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger" th:if="${session.userRole == 'ADMIN'}"
+                                            <button class="btn btn-sm btn-outline-danger"
                                                     data-bs-toggle="modal"
                                                     th:data-bs-target="'#deleteItemModal' + ${item.id}">
                                                 <i class="fas fa-trash"></i> Delete
@@ -427,15 +414,120 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <!-- Add the "No items found" message here -->
-                            <div class="text-center py-4" th:if="${#lists.isEmpty(listItems)}">
+
+                            <!-- No items message -->
+                            <div class="text-center py-4" th:if="${pageItems.empty}">
                                 <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                                 <p class="text-muted">No inventory items found</p>
                             </div>
+
+                            <!-- Pagination Controls -->
+                            <nav aria-label="Inventory pagination" th:unless="${pageItems.empty}">
+                                <ul class="pagination justify-content-center">
+                                    <!-- Previous -->
+                                    <li class="page-item" th:classappend="${!pageItems.hasPrevious()} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/inventory(page=${pageItems.number - 1},
+                                                    size=${pageItems.size},
+                                                    search=${searchTerm},
+                                                    category=${selectedCategory})}"
+                                           tabindex="-1">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Page numbers -->
+                                    <li class="page-item"
+                                        th:each="pageNum : ${#numbers.sequence(0, pageItems.totalPages - 1)}"
+                                        th:classappend="${pageNum == pageItems.number} ? 'active'">
+                                        <a class="page-link"
+                                           th:href="@{/inventory(page=${pageNum},
+                                                    size=${pageItems.size},
+                                                    search=${searchTerm},
+                                                    category=${selectedCategory})}"
+                                           th:text="${pageNum + 1}">1</a>
+                                    </li>
+
+                                    <!-- Next -->
+                                    <li class="page-item" th:classappend="${!pageItems.hasNext()} ? 'disabled'">
+                                        <a class="page-link"
+                                           th:href="@{/inventory(page=${pageItems.number + 1},
+                                                    size=${pageItems.size},
+                                                    search=${searchTerm},
+                                                    category=${selectedCategory})}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                </ul>
+
+                                <!-- Page info -->
+                                <div class="text-center text-muted small mt-2">
+                                    Showing <span th:text="${pageItems.numberOfElements}"></span> of
+                                    <span th:text="${pageItems.totalElements}"></span> items
+                                </div>
+                            </nav>
                         </div>
                     </div>
                 </div>
             </div>
+<!--            <div class="row">-->
+<!--                <div class="col-12">-->
+<!--                    <div class="card border-0 shadow-sm">-->
+<!--                        <div class="card-body">-->
+<!--                            <div class="table-responsive">-->
+<!--                                <table class="table table-hover">-->
+<!--                                    <thead>-->
+<!--                                    <tr>-->
+<!--                                        <th>S.N</th>-->
+<!--                                        <th>Item Name</th>-->
+<!--                                        <th>Category</th>-->
+<!--                                        &lt;!&ndash;                                        <th>Count</th>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        <th>Expiry Date</th>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        <th>Status</th>&ndash;&gt;-->
+<!--                                        <th th:if="${session.userRole == 'ADMIN'}">Actions</th>-->
+<!--                                    </tr>-->
+<!--                                    </thead>-->
+<!--                                    <tbody>-->
+<!--                                    <tr th:each="item, itemcount : ${listItems}">-->
+<!--                                        <td th:text="${itemcount.count}"></td>-->
+<!--                                        <td th:text="${item.name}"></td>-->
+<!--                                        <td th:text="${item.category}"></td>-->
+<!--                                        &lt;!&ndash;                                        <td>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                                <span th:text="${item.count}"&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                                      th:class="${item.count < 10 ? 'text-warning fw-bold' : 'text-dark'}">25</span>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        </td>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        <td th:text="${#temporals.format(item.expiryDate, 'yyyy-MM-dd')}">2024-01-15</td>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        <td>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRED'}" class="badge bg-danger">Expired</span>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                            <span th:if="${#strings.toUpperCase(item.status) == 'EXPIRING_SOON'}" class="badge bg-warning text-dark">Expiring Soon</span>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                            <span th:if="${#strings.toUpperCase(item.status) == 'LOW_STOCK'}" class="badge bg-orange">Low Stock</span>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                            <span th:if="${#strings.toUpperCase(item.status) == 'GOOD'}" class="badge bg-success">Good</span>&ndash;&gt;-->
+<!--                                        &lt;!&ndash;                                        </td>&ndash;&gt;-->
+<!--                                        <td>-->
+<!--                                            <button class="btn btn-sm btn-outline-primary" th:if="${session.userRole == 'ADMIN'}"-->
+<!--                                                    data-bs-toggle="modal"-->
+<!--                                                    th:data-bs-target="'#adjustModal' + ${item.id}">-->
+<!--                                                <i class="fas fa-edit"></i> Adjust-->
+<!--                                            </button>-->
+<!--                                            <button class="btn btn-sm btn-outline-danger" th:if="${session.userRole == 'ADMIN'}"-->
+<!--                                                    data-bs-toggle="modal"-->
+<!--                                                    th:data-bs-target="'#deleteItemModal' + ${item.id}">-->
+<!--                                                <i class="fas fa-trash"></i> Delete-->
+<!--                                            </button>-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                                    </tbody>-->
+<!--                                </table>-->
+<!--                            </div>-->
+<!--                            &lt;!&ndash; Add the "No items found" message here &ndash;&gt;-->
+<!--                            <div class="text-center py-4" th:if="${#lists.isEmpty(listItems)}">-->
+<!--                                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>-->
+<!--                                <p class="text-muted">No inventory items found</p>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
     </div>
 </div>
@@ -510,12 +602,9 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Category</label>
-                        <select class="form-select" name="category" required>
-                            <option value="Ingredients">Ingredients</option>
-                            <option value="Syrups">Syrups</option>
-                            <option value="Fruits">Fruits</option>
-                            <option value="Packaging">Packaging</option>
-                            <option value="Other">Other</option>
+                        <select class="form-select" name="category" id="category" required>
+                            <option value="" disabled selected>-- Select Category --</option>
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"></option>
                         </select>
                     </div>
                     <!--                    <div class="mb-3">-->
