@@ -59,13 +59,6 @@ public class DashboardController {
         System.out.println(userRole);
 //        model.addAttribute("franchiseId", adminFranchiseId);
 //        System.out.println(session.getAttribute("franchiseId"));
-        size = Math.min(size, 50); // prevent abuse
-        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
-
-        Page<InventoryItem> inventoryPage = inventoryService
-                .findInventoryForCurrentUserFranchise(pageable);
-
-        model.addAttribute("inventoryPage", inventoryPage);
 
             if (adminFranchiseId != null) {
                 Franchise adminFranchise = franchiseService.findById(adminFranchiseId).orElse(null);
@@ -157,6 +150,16 @@ public class DashboardController {
 //                    }
             }
         }
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "dashboard"; // show login
+        }
+        size = Math.min(size, 50); // prevent abuse
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+
+        Page<InventoryItem> inventoryPage = inventoryService.getAllItems(pageable);
+
+        model.addAttribute("inventoryPage", inventoryPage);
         model.addAttribute("userEmail", userEmail);
         model.addAttribute("currentPage", "dashboard");
         model.addAttribute("categories", List.of(

@@ -123,7 +123,10 @@ public String login(
                     HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext()
             );
-
+            session.setAttribute("franchiseId", user.getId());
+            System.out.println(
+                    user.getId()
+            );
             return "redirect:/dashboard";
         }
     }

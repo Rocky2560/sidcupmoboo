@@ -37,8 +37,22 @@ public class InventoryService {
         return inventoryItemRepository.findAll();
     }
 
+    public Page<InventoryItem> getAllItems(Pageable pageable) {
+        return inventoryItemRepository.findAll(pageable);
+    }
+
     public List<InventoryItem> getItemsByFranchise(Franchise franchise) {
         return inventoryItemRepository.findByFranchise(franchise);
+    } // ✅ New method: get inventory by USER ID (via their franchise)
+    public Page<InventoryItem> getInventoryByUserId(Long userId, Pageable pageable) {
+        User user = userService.findById(userId); // throws if not found
+        Franchise franchise = user.getFranchise();
+
+        if (franchise == null) {
+            return Page.empty(); // user has no franchise → no inventory
+        }
+
+        return inventoryItemRepository.findByFranchise(franchise, pageable);
     }
 
 //    public List<InventoryItem> getItemsByFranchise(Franchise franchise) {
