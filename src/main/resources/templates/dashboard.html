@@ -210,7 +210,10 @@
 <div th:if="${session.user != null}">
     <!-- Sidebar -->
 
-    <nav class="sidebar d-none d-md-block">
+    <nav class="sidebar">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="p-4">
             <div class="d-flex align-items-center mb-4">
                 <div class="bg-primary text-white p-2 rounded-circle me-3">
@@ -260,9 +263,6 @@
         <!-- Top Navbar -->
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
             <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <div class="d-flex ms-auto">
                         <div class="dropdown">
